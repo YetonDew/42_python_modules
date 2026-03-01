@@ -10,7 +10,10 @@
 #                                                                              #
 # **************************************************************************** #
 
-from ..ex1.ft_garden_data import Plant as BasePlant
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from ex1.ft_garden_data import Plant as BasePlant
 
 class Plant(BasePlant):
 	def grow(self, days: int):
