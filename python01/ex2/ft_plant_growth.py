@@ -1,18 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    ft_plant_growth.py                                 :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: ajeffers <ajeffers@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/03/01 18:24:53 by ajeffers          #+#    #+#              #
-#    Updated: 2026/03/01 18:24:55 by ajeffers         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from ex1.ft_garden_data import Plant as BasePlant
 
 class Plant(BasePlant):
