@@ -12,10 +12,12 @@ def check_temperature(temp_str):
         print(f"Temperature {temp_str}°C is perfect for plants!")
         return temp_str
 
+
 def start():
     print("=== Garden Temperature Checker ===")
     user_temp = input("Testing temperature: ")
     check_temperature(user_temp)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     start()

@@ -13,8 +13,9 @@ class Plant:
     def kind(self):
         return "regular"
 
+
 class FlowerPlant(Plant):
-    def __init__(self, name, height, color:str):
+    def __init__(self, name, height, color: str):
         super().__init__(name, height)
         self.color = color
 
@@ -23,6 +24,7 @@ class FlowerPlant(Plant):
 
     def kind(self):
         return "flowering"
+
 
 class PrizeFlower(FlowerPlant):
     def __init__(self, name, height, color, prize_points):
@@ -34,6 +36,7 @@ class PrizeFlower(FlowerPlant):
 
     def kind(self):
         return "prize"
+
 
 class Garden:
     def __init__(self, owner):
@@ -74,8 +77,15 @@ class Garden:
                 regular += 1
 
         print()
-        print(f"Plants added: {count_plants}, Total growth: {self.total_growth}cm")
-        print(f"Plant types: {regular} regular, {flowering} flowering, {prize} prize flowers")
+        print(
+            f"Plants added: {count_plants}, "
+            f"Total growth: {self.total_growth}cm"
+        )
+        print(
+            f"Plant types: {regular} regular, {flowering} flowering, "
+            f"{prize} prize flowers"
+        )
+
 
 class GardenManager:
     total_gardens = 0
@@ -103,7 +113,6 @@ class GardenManager:
         garden = self.get_or_create_garden(owner)
         garden.add_plant(plant)
 
-
     def grow_garden(self, owner, amount=1):
         garden = self.get_or_create_garden(owner)
         garden.grow_all(amount)
@@ -112,11 +121,13 @@ class GardenManager:
     def garden_report(self, owner):
         self.gardens[owner].report()
 
+
 def calculate_score(manager, owner):
     total = 0
     for plant in manager.gardens[owner].plants:
         total += plant.height
     return total
+
 
 if __name__ == "__main__":
     print("=== Garden Management System Demo ===\n")
@@ -141,9 +152,11 @@ if __name__ == "__main__":
 
     print("Height validation test:", GardenManager.is_valid_height(-30))
 
-    print("Garden scores - Alice:",
-          calculate_score(mgr, "Alice"),
-          "Bob:",
-          calculate_score(mgr, "Bob"))
+    print(
+        "Garden scores - Alice:",
+        calculate_score(mgr, "Alice"),
+        "Bob:",
+        calculate_score(mgr, "Bob"),
+    )
 
     print("Total gardens managed:", GardenManager.total_gardens)

@@ -17,8 +17,10 @@ class Garden:
 
     def add_plant(self, name, needs_water):
         if self.water_reserve < needs_water:
-            raise WaterError(f"Cannot plant {name}: only {self.water_reserve}L "
-                             f"left, needs {needs_water}L")
+            raise WaterError(
+                f"Cannot plant {name}: only {self.water_reserve}L "
+                f"left, needs {needs_water}L"
+            )
         self.plants[name] = {"water_need": needs_water, "health": "good"}
         self.water_reserve -= needs_water
 
@@ -26,8 +28,9 @@ class Garden:
         if name not in self.plants:
             raise PlantError(f"{name} is not in the garden!")
         if self.plants[name]["health"] != "good":
-            raise PlantError(f"{name} is {self.plants[name]['health']}, "
-                             "cannot harvest!")
+            raise PlantError(
+                f"{name} is {self.plants[name]['health']}, " "cannot harvest!"
+            )
         del self.plants[name]
         return f"Harvested {name} successfully"
 

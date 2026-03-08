@@ -1,5 +1,6 @@
 from ex1.ft_garden_data import Plant as BasePlant
 
+
 def main():
     datos = [
         {"name": "Rose", "height": 25, "age": 30},
@@ -18,6 +19,7 @@ def main():
     for p in plantas:
         print(f"Created: {p.name} ({p.height}cm, {p.age} days)")
     print(f"Total plants created: {len(datos)}")
+
 
 if __name__ == "__main__":
     main()

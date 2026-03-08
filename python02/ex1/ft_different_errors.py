@@ -1,5 +1,6 @@
 test_mode = "value"
 
+
 def garden_operations():
     if test_mode == "value":
         int("forty two")
@@ -10,6 +11,7 @@ def garden_operations():
     elif test_mode == "key":
         dct = {"a": 2}
         dct["missing plant"]
+
 
 def test_error_types():
     global test_mode
@@ -28,10 +30,10 @@ def test_error_types():
     print("Testing multiple errors together...")
     try:
         garden_operations()
-    except (ValueError, ZeroDivisionError, FileNotFoundError,
-            KeyError):
+    except (ValueError, ZeroDivisionError, FileNotFoundError, KeyError):
         print("Caught an error, but program continues!")
         print()
     print("All error types tested successfully!")
+
 
 test_error_types()
