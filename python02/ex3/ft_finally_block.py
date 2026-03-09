@@ -1,3 +1,7 @@
+class InvalidNameError(Exception):
+    pass
+
+
 class WaterSystem:
     def __init__(self):
         self.is_on = False
@@ -19,8 +23,42 @@ class WaterSystem:
 
 def water_plants(plant_list):
     system = WaterSystem()
-    system.open
+    system.open()
+    is_successful = True
+    try:
+        for plant in plant_list:
+            if plant["name"] is None:
+                raise InvalidNameError(
+                    f"That plant {plant["name"]}doesnt exist"
+                )
+            plant["water_ml"] += 100
+            print(f"Watering {plant["name"]}")
+    except InvalidNameError as e:
+        print(f"Error: {e}")
+        is_successful = False
+    finally:
+        system.close()
+        if is_successful:
+            print("Watering completed successfully!")
 
 
 def main():
-    pass
+    plants = [
+        {"name": "Tomato", "water_ml": 500},
+        {"name": "Basil", "water_ml": 250},
+        {"name": "Cactus", "water_ml": 50},
+        {"name": "Rose", "water_ml": 0},
+        {"name": "Mint", "water_ml": 200},
+    ]
+    wrong_plants = [
+        {"name": "Tomato", "water_ml": 00},
+        {"name": None, "water_ml": 99},
+        {"name": "Tomato", "water_ml": 500},
+        {"name": "Tomato", "water_ml": 500},
+    ]
+    water_plants(plants)
+    water_plants(wrong_plants)
+
+
+if __name__ == "__main__":
+    main()
