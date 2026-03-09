@@ -9,7 +9,7 @@
 |--------|-----------|-------------|
 | 00 | `python00/` | Variables, I/O, conditionals, loops, recursion, and functions |
 | 01 | `python01/` | Classes, inheritance, encapsulation, and factory patterns |
-| 02 | `python02/` | Exception handling and custom errors |
+| 02 | `python02/` | Exception handling, custom errors, finally blocks & garden management |
 
 ## How to run
 
