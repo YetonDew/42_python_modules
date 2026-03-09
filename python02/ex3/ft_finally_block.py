@@ -21,7 +21,7 @@ class WaterSystem:
             print("Water system is already closed.")
 
 
-def water_plants(plant_list: tuple[str, str, str, int]):
+def water_plants(plant_list: list[dict]):
     system = WaterSystem()
     system.open()
     is_successful = True
