@@ -29,7 +29,7 @@ def water_plants(plant_list: tuple[str, str, str, int]):
         for plant in plant_list:
             if plant["name"] is None:
                 raise InvalidNameError(
-                    f"That plant {plant["name"]}doesnt exist"
+                    f"That plant '{plant["name"]}' doesnt exist"
                 )
             plant["water_ml"] += 100
             print(f"Watering {plant["name"]}")
