@@ -29,10 +29,10 @@ def water_plants(plant_list: list[dict]):
         for plant in plant_list:
             if plant["name"] is None:
                 raise InvalidNameError(
-                    f"That plant '{plant["name"]}' doesnt exist"
+                    f"That plant {plant['name']} doesnt exist"
                 )
             plant["water_ml"] += 100
-            print(f"Watering {plant["name"]}")
+            print(f"Watering {plant['name']}")
     except InvalidNameError as e:
         print(f"Error: {e}")
         is_successful = False
