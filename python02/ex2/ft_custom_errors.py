@@ -11,11 +11,11 @@ class WaterError(GardenError):
 
 
 class Garden:
-    def __init__(self, water_reserve):
+    def __init__(self, water_reserve: int):
         self.water_reserve = water_reserve
         self.plants = {}
 
-    def add_plant(self, name, needs_water):
+    def add_plant(self, name: str, needs_water: int):
         if self.water_reserve < needs_water:
             raise WaterError(
                 f"Cannot plant {name}: only {self.water_reserve}L "
@@ -24,7 +24,7 @@ class Garden:
         self.plants[name] = {"water_need": needs_water, "health": "good"}
         self.water_reserve -= needs_water
 
-    def harvest(self, name):
+    def harvest(self, name: str):
         if name not in self.plants:
             raise PlantError(f"{name} is not in the garden!")
         if self.plants[name]["health"] != "good":

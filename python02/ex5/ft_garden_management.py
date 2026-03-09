@@ -33,7 +33,7 @@ class GardenManager:
     def __init__(self):
         self.plants = {}
 
-    def add_plant(self, name):
+    def add_plant(self, name: str):
         try:
             if name is None or not name.strip():
                 raise PlantError("Plant name cannot be empty!")
@@ -59,8 +59,7 @@ class GardenManager:
             try:
                 if plant["water"] < 1:
                     raise WaterError(
-                        f"Water level {plant['water']}"
-                        f" is too low (min 1)"
+                        f"Water level {plant['water']}" f" is too low (min 1)"
                     )
                 elif plant["water"] > 10:
                     raise WaterError(
