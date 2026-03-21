@@ -1,6 +1,12 @@
 import os
+
+# os: Provides OS-level utilities (here used for path manipulation)
 import site
+
+# site: Provides access to site-specific configuration, including package paths
 import sys
+
+# sys: Provides access to Python interpreter variables and functions
 
 
 def check_matrix_status() -> None:
