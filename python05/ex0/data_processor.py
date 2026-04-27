@@ -159,98 +159,56 @@ class LogProcessor(DataProcessor):
         return ", ".join(pairs)
 
 
-class DataStream:
-    def __init__(self) -> None:
-        self._processors: list[DataProcessor] = []
-
-    def register_processor(self, proc: DataProcessor) -> None:
-        self._processors.append(proc)
-
-    def process_stream(self, stream: list[Any]) -> None:
-        for element in stream:
-            if not self._route_element(element):
-                print(
-                    "DataStream error - Can't process element "
-                    f"in stream: {element}"
-                )
-
-    def print_processors_stats(self) -> None:
-        print("== DataStream statistics ==")
-        if not self._processors:
-            print("No processor found, no data")
-            return
-
-        for processor in self._processors:
-            print(
-                f"{processor.display_name()}: total "
-                f"{processor.total_processed()} items processed, "
-                f"remaining {processor.remaining()} on processor"
-            )
-
-    def _route_element(self, element: Any) -> bool:
-        for processor in self._processors:
-            if processor.validate(element):
-                processor.ingest(element)
-                return True
-        return False
-
-
-def consume_many(processor: DataProcessor, count: int) -> None:
+def print_many(processor: DataProcessor, count: int, label: str) -> None:
     for _ in range(count):
-        try:
-            processor.output()
-        except IndexError:
-            return
+        rank, value = processor.output()
+        print(f"{label} {rank}: {value}")
 
 
 def main() -> None:
-    print("=== Code Nexus - Data Stream ===")
-    print("Initialize Data Stream...")
-    data_stream = DataStream()
-    data_stream.print_processors_stats()
+    print("=== Code Nexus - Data Processor ===")
 
     numeric = NumericProcessor()
     text = TextProcessor()
     log = LogProcessor()
 
-    first_batch: list[Any] = [
-        "Hello world",
-        [3.14, -1, 2.71],
-        [
-            {
-                "log_level": "WARNING",
-                "log_message": "Telnet access! Use ssh instead",
-            },
-            {
-                "log_level": "INFO",
-                "log_message": "User wil is connected",
-            },
-        ],
-        42,
-        ["Hi", "five"],
+    print("Testing Numeric Processor...")
+    print(f"Trying to validate input '42': {numeric.validate(42)}")
+    print(f"Trying to validate input 'Hello': {numeric.validate('Hello')}")
+    print("Test invalid ingestion of string 'foo' without prior validation:")
+    try:
+        numeric.ingest("foo")  # type: ignore[call-overload]
+    except ValueError as error:
+        print(f"Got exception: {error}")
+
+    print("Processing data: [1, 2, 3, 4, 5]")
+    numeric.ingest([1, 2, 3, 4, 5])
+    print("Extracting 3 values...")
+    print_many(numeric, 3, "Numeric value")
+
+    print("Testing Text Processor...")
+    print(f"Trying to validate input '42': {text.validate(42)}")
+    print("Processing data: ['Hello', 'Nexus', 'World']")
+    text.ingest(["Hello", "Nexus", "World"])
+    print("Extracting 1 value...")
+    print_many(text, 1, "Text value")
+
+    print("Testing Log Processor...")
+    print(f"Trying to validate input 'Hello': {log.validate('Hello')}")
+    log_data = [
+        {
+            "log_level": "NOTICE",
+            "log_message": "Connection to server",
+        },
+        {
+            "log_level": "ERROR",
+            "log_message": "Unauthorized access!!",
+        },
     ]
-
-    print("Registering Numeric Processor")
-    print("Send first batch of data on stream: " f"{first_batch}")
-    data_stream.register_processor(numeric)
-    data_stream.process_stream(first_batch)
-    data_stream.print_processors_stats()
-
-    print("Registering other data processors")
-    data_stream.register_processor(text)
-    data_stream.register_processor(log)
-    print("Send the same batch again")
-    data_stream.process_stream(first_batch)
-    data_stream.print_processors_stats()
-
-    print(
-        "Consume some elements from the data processors: "
-        "Numeric 3, Text 2, Log 1"
-    )
-    consume_many(numeric, 3)
-    consume_many(text, 2)
-    consume_many(log, 1)
-    data_stream.print_processors_stats()
+    print(f"Processing data: {log_data}")
+    log.ingest(log_data)
+    print("Extracting 2 values...")
+    print_many(log, 2, "Log entry")
 
 
 if __name__ == "__main__":
