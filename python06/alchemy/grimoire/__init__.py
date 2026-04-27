@@ -1,4 +1,3 @@
-from .spellbook import record_spell
-from .validator import validate_ingredients
+from .light_spellbook import light_spell_record
 
-__all__ = ["record_spell", "validate_ingredients"]
+__all__ = ["light_spell_record"]
