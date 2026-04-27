@@ -1,15 +1,45 @@
-print("=== CYBER ARCHIVES - VAULT SECURITY SYSTEM ===\n")
+def secure_archive(
+    file_name: str,
+    action: str = "read",
+    content: str = "",
+) -> tuple[bool, str]:
+    try:
+        if action == "read":
+            with open(file_name, "r") as file_handle:
+                return True, file_handle.read()
 
-print("Initiating secure vault access...")
-print("Vault connection established with failsafe protocols\n")
-with open("classified_data.txt", "r") as classified_file:
-    print("SECURE EXTRACTION:")
-    print(classified_file.read())
-    print()
+        if action == "write":
+            with open(file_name, "w") as file_handle:
+                file_handle.write(content)
+            return True, "Content successfully written to file"
 
-with open("security_protocols.txt", "w") as new_secury_file:
-    print("SECURE PRESERVATION:")
-    new_secury_file.write("[CLASSIFIED] New security protocols archived")
-    print("[CLASSIFIED] New security protocols archived")
-print("Vault automatically sealed upon completion\n")
-print("All vault operations completed with maximum security.")
+        return False, "Invalid action"
+    except OSError as error:
+        return False, str(error)
+
+
+def main() -> None:
+    print("=== Cyber Archives Security ===")
+    print("Using 'secure_archive' to read from a nonexistent file:")
+    print(secure_archive("/not/existing/file"))
+    print("Using 'secure_archive' to read from an inaccessible file:")
+    print(secure_archive("/etc/master.passwd"))
+
+    demo_content = (
+        "[FRAGMENT 001] Digital preservation protocols established 2087\n"
+        "[FRAGMENT 002] Knowledge must survive the entropy wars\n"
+        "[FRAGMENT 003] Every byte saved is a victory against oblivion\n"
+    )
+    secure_archive("secure_demo_archive.txt", "write", demo_content)
+
+    print("Using 'secure_archive' to read from a regular file:")
+    print(secure_archive("secure_demo_archive.txt"))
+
+    print("Using 'secure_archive' to write previous content to a new file:")
+    read_success, read_content = secure_archive("secure_demo_archive.txt")
+    if read_success:
+        print(secure_archive("secure_demo_copy.txt", "write", read_content))
+
+
+if __name__ == "__main__":
+    main()

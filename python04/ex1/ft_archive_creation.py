@@ -1,14 +1,79 @@
-print("=== CYBER ARCHIVES - PRESERVATION SYSTEM ===\n")
-print("Initializing new storage unit: new_discovery.txt")
-file = open("new_discovery.txt", "w")
-print("Storage unit created successfully...\n")
-print("Inscribing preservation data...")
-file.write("[ENTRY 001] New quantum algorithm discovered\n")
-print("[ENTRY 001] New quantum algorithm discovered")
-file.write("[ENTRY 002] Efficiency increased by 347%\n")
-print("[ENTRY 002] Efficiency increased by 347%")
-file.write("[ENTRY 003] Archived by Data Archivist trainee\n")
-print("[ENTRY 003] Archived by Data Archivist trainee\n")
-print("Data inscription complete. Storage unit sealed.")
-print("Archive 'new_discovery.txt' ready for long-term preservation.")
-file.close()
+import sys
+import typing
+
+
+def read_archive(file_name: str) -> str | None:
+    file_handle: typing.IO[str] | None = None
+
+    try:
+        file_handle = open(file_name, "r")
+        print("---")
+        content = file_handle.read()
+        print(content, end="" if content.endswith("\n") else "\n")
+        print("---")
+        return content
+    except OSError as error:
+        print(f"Error opening file '{file_name}': {error}")
+        return None
+    finally:
+        if file_handle is not None:
+            file_handle.close()
+            print(f"File '{file_name}' closed.")
+
+
+def transform_content(content: str) -> str:
+    return "".join(f"{line}#\n" for line in content.splitlines())
+
+
+def save_archive(file_name: str, content: str) -> bool:
+    file_handle: typing.IO[str] | None = None
+
+    try:
+        file_handle = open(file_name, "w")
+        file_handle.write(content)
+        print(f"Data saved in file '{file_name}'.")
+        return True
+    except OSError as error:
+        print(f"Error opening file '{file_name}': {error}")
+        print("Data not saved.")
+        return False
+    finally:
+        if file_handle is not None:
+            file_handle.close()
+
+
+def print_transformed_content(content: str) -> None:
+    print("---")
+    print(content, end="" if content.endswith("\n") else "\n")
+    print("---")
+
+
+def main() -> None:
+    if len(sys.argv) != 2:
+        print("Usage: ft_archive_creation.py <file>")
+        return
+
+    file_name = sys.argv[1]
+    print("=== Cyber Archives Recovery & Preservation ===")
+    print(f"Accessing file '{file_name}'")
+
+    content = read_archive(file_name)
+    if content is None:
+        return
+
+    transformed_content = transform_content(content)
+    print("Transform data:")
+    print_transformed_content(transformed_content)
+
+    print("Enter new file name (or empty): ", end="")
+    new_file_name = input()
+    if new_file_name == "":
+        print("Not saving data.")
+        return
+
+    print(f"Saving data to '{new_file_name}'")
+    save_archive(new_file_name, transformed_content)
+
+
+if __name__ == "__main__":
+    main()
