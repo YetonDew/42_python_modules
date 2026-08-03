@@ -25,20 +25,13 @@ def main() -> None:
     print("Using 'secure_archive' to read from an inaccessible file:")
     print(secure_archive("/etc/master.passwd"))
 
-    demo_content = (
-        "[FRAGMENT 001] Digital preservation protocols established 2087\n"
-        "[FRAGMENT 002] Knowledge must survive the entropy wars\n"
-        "[FRAGMENT 003] Every byte saved is a victory against oblivion\n"
-    )
-    secure_archive("secure_demo_archive.txt", "write", demo_content)
-
     print("Using 'secure_archive' to read from a regular file:")
-    print(secure_archive("secure_demo_archive.txt"))
+    print(secure_archive("ancient_fragment.txt"))
 
     print("Using 'secure_archive' to write previous content to a new file:")
-    read_success, read_content = secure_archive("secure_demo_archive.txt")
+    read_success, read_content = secure_archive("ancient_fragment.txt")
     if read_success:
-        print(secure_archive("secure_demo_copy.txt", "write", read_content))
+        print(secure_archive("new_fragment.txt", "write", read_content))
 
 
 if __name__ == "__main__":
