@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Protocol, overload
+from typing import Any, Protocol
 
 
 NumericValue = int | float
@@ -79,15 +79,7 @@ class NumericProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         return is_numeric_value(data) or is_numeric_list(data)
 
-    @overload
-    def ingest(self, data: NumericValue) -> None:
-        pass
-
-    @overload
-    def ingest(self, data: NumericList) -> None:
-        pass
-
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: NumericValue | NumericList) -> None:
         if is_numeric_value(data):
             self._store(str(data))
             return
@@ -104,15 +96,7 @@ class TextProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         return isinstance(data, str) or is_text_list(data)
 
-    @overload
-    def ingest(self, data: str) -> None:
-        pass
-
-    @overload
-    def ingest(self, data: TextList) -> None:
-        pass
-
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: str | TextList) -> None:
         if isinstance(data, str):
             self._store(data)
             return
@@ -129,15 +113,7 @@ class LogProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         return is_log_entry(data) or is_log_list(data)
 
-    @overload
-    def ingest(self, data: LogEntry) -> None:
-        pass
-
-    @overload
-    def ingest(self, data: LogList) -> None:
-        pass
-
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: LogEntry | LogList) -> None:
         if is_log_entry(data):
             self._store(self._format_log(data))
             return
@@ -169,8 +145,13 @@ class CSVExportPlugin:
         print("CSV Output:")
         values: list[str] = []
         for _, value in data:
-            values.append(value)
+            values.append(self._escape(value))
         print(",".join(values))
+
+    def _escape(self, value: str) -> str:
+        if any(char in value for char in ',"\n\r'):
+            return f'"{value.replace(chr(34), chr(34) * 2)}"'
+        return value
 
 
 class JSONExportPlugin:
@@ -183,7 +164,24 @@ class JSONExportPlugin:
         print("{" + ", ".join(items) + "}")
 
     def _escape(self, value: str) -> str:
-        return value.replace("\\", "\\\\").replace('"', '\\"')
+        escaped = ""
+        replacements = {
+            '"': '\\"',
+            "\\": "\\\\",
+            "\b": "\\b",
+            "\f": "\\f",
+            "\n": "\\n",
+            "\r": "\\r",
+            "\t": "\\t",
+        }
+        for char in value:
+            if char in replacements:
+                escaped += replacements[char]
+            elif ord(char) < 32:
+                escaped += f"\\u{ord(char):04x}"
+            else:
+                escaped += char
+        return escaped
 
 
 class DataStream:

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, overload
+from typing import Any
 
 
 NumericValue = int | float
@@ -79,15 +79,7 @@ class NumericProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         return is_numeric_value(data) or is_numeric_list(data)
 
-    @overload
-    def ingest(self, data: NumericValue) -> None:
-        pass
-
-    @overload
-    def ingest(self, data: NumericList) -> None:
-        pass
-
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: NumericValue | NumericList) -> None:
         if is_numeric_value(data):
             self._store(str(data))
             return
@@ -104,15 +96,7 @@ class TextProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         return isinstance(data, str) or is_text_list(data)
 
-    @overload
-    def ingest(self, data: str) -> None:
-        pass
-
-    @overload
-    def ingest(self, data: TextList) -> None:
-        pass
-
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: str | TextList) -> None:
         if isinstance(data, str):
             self._store(data)
             return
@@ -129,15 +113,7 @@ class LogProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         return is_log_entry(data) or is_log_list(data)
 
-    @overload
-    def ingest(self, data: LogEntry) -> None:
-        pass
-
-    @overload
-    def ingest(self, data: LogList) -> None:
-        pass
-
-    def ingest(self, data: Any) -> None:
+    def ingest(self, data: LogEntry | LogList) -> None:
         if is_log_entry(data):
             self._store(self._format_log(data))
             return
@@ -177,7 +153,7 @@ def main() -> None:
     print(f"Trying to validate input 'Hello': {numeric.validate('Hello')}")
     print("Test invalid ingestion of string 'foo' without prior validation:")
     try:
-        numeric.ingest("foo")  # type: ignore[call-overload]
+        numeric.ingest("foo")
     except ValueError as error:
         print(f"Got exception: {error}")
 
