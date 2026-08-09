@@ -1,111 +1,107 @@
 import os
 import sys
-from dotenv import load_dotenv
 
-# Variables required by the Oracle
-REQUIRED_VARS = [
+
+REQUIRED_VARS = (
     "MATRIX_MODE",
     "DATABASE_URL",
     "API_KEY",
     "LOG_LEVEL",
     "ZION_ENDPOINT",
-]
+)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ENV_FILE = os.path.join(BASE_DIR, ".env")
+
+
+class ConfigurationError(Exception):
+    pass
 
 
 def load_config() -> dict[str, str | None]:
-    """
-    Load configuration from environment variables.
-    load_dotenv() allows .env file variables to be accessed via os.environ
-    """
-    load_dotenv()
-    return {var: os.environ.get(var) for var in REQUIRED_VARS}
+    try:
+        from dotenv import load_dotenv
+    except ImportError as error:
+        raise ConfigurationError(
+            "python-dotenv is missing; run "
+            "'pip install -r requirements.txt'"
+        ) from error
+
+    load_dotenv(ENV_FILE, override=False)
+    return {name: os.environ.get(name) for name in REQUIRED_VARS}
 
 
 def check_config(config: dict[str, str | None]) -> bool:
-    """
-    Check for missing values and enforce production strictness .
-    """
-    all_ok = True
-    is_prod = config.get("MATRIX_MODE") == "production"
+    mode = config.get("MATRIX_MODE")
+    missing = [name for name in REQUIRED_VARS if not config.get(name)]
 
-    for var in REQUIRED_VARS:
-        if not config[var]:
-            # Print warning/critical messages based on the current mode
-            level = "[CRITICAL]" if is_prod else "[WARNING]"
-            print(f"{level} {var} is missing!")
-            all_ok = False
+    if mode not in {"development", "production"}:
+        print("[WARNING] MATRIX_MODE must be development or production")
 
-    # In production, missing variables must halt the program
-    if is_prod and not all_ok:
-        print("\nMISSION ABORTED: Production environment is incomplete.")
-        sys.exit(1)
+    level = "CRITICAL" if mode == "production" else "WARNING"
+    for name in missing:
+        print(f"[{level}] {name} is missing!")
 
-    return all_ok
+    if mode == "production" and missing:
+        raise ConfigurationError(
+            "Production environment is incomplete"
+        )
+    return not missing and mode in {"development", "production"}
 
 
-def main() -> None:
-    print("\nORACLE STATUS: Reading the Matrix...\n")
-    config = load_config()
+def database_status(database_url: str | None) -> str:
+    if not database_url:
+        return "Disconnected"
+    if "localhost" in database_url or "127.0.0.1" in database_url:
+        return "Connected to local instance"
+    return "Connected to remote instance"
 
-    # Check config but allow the program to display partial info in dev mode
-    is_complete = check_config(config)
 
-    if not is_complete:
-        print("\nConfiguration incomplete. Please check your .env file.\n")
-
+def display_config(config: dict[str, str | None]) -> None:
     print("Configuration loaded:")
-
-    # Mode: development or production
-    print(f"Mode: {config.get('MATRIX_MODE') or 'None'}")
-
-    # Database: Status-based output instead of raw connection string
-    db_url = config.get("DATABASE_URL")
-    if not db_url:
-        db_status = "Disconnected"
-    elif "localhost" in db_url:
-        db_status = "Connected to local instance"
-    else:
-        db_status = "Connected to remote"
-    print(f"Database: {db_status}")
-
-    # API Access: Authenticated status
+    print(f"Mode: {config.get('MATRIX_MODE') or 'Not configured'}")
+    print(f"Database: {database_status(config.get('DATABASE_URL'))}")
     api_status = "Authenticated" if config.get("API_KEY") else "Missing"
     print(f"API Access: {api_status}")
-
-    # Log Level: DEBUG, INFO, etc.
-    print(f"Log Level: {config.get('LOG_LEVEL') or 'None'}")
-
-    # Zion Network: Online status based on endpoint presence
+    print(f"Log Level: {config.get('LOG_LEVEL') or 'Not configured'}")
     zion_status = "Online" if config.get("ZION_ENDPOINT") else "Offline"
-    print(f"Zion Network: {zion_status}\n")
+    print(f"Zion Network: {zion_status}")
 
-    # --- SECURITY CHECKS---
+
+def security_check(config: dict[str, str | None]) -> None:
     print("Environment security check:")
-
-    # Check for placeholder strings in API_KEY
-    if config.get("API_KEY") == "your_api_key_here":
-        print("[WARNING] Hardcoded API_KEY placeholder detected!")
+    placeholders = {"your_api_key_here", "change_me", "replace_me"}
+    if config.get("API_KEY") in placeholders:
+        print("[WARNING] Replace the example API key")
     else:
         print("[OK] No hardcoded secrets detected")
 
-    # Check for physical .env file
-    if os.path.exists(".env"):
+    if os.path.isfile(ENV_FILE):
         print("[OK] .env file properly configured")
     else:
         print("[WARNING] .env file missing")
 
-    # Production override detection
     if config.get("MATRIX_MODE") == "production":
         print("[OK] Production overrides available")
     else:
         print("[INFO] Development mode active")
-    print("\nThe Oracle sees all configurations.")
+
+
+def main() -> int:
+    print("ORACLE STATUS: Reading the Matrix...")
+    try:
+        config = load_config()
+        complete = check_config(config)
+    except ConfigurationError as error:
+        print(f"MISSION ABORTED: {error}")
+        return 1
+
+    if not complete:
+        print("Configuration incomplete; review .env.example")
+    display_config(config)
+    security_check(config)
+    print("The Oracle sees all configurations.")
+    return 0
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        # Graceful handling of unexpected Matrix glitches
-        print(f"The Oracle encountered a critical error: {e}")
-        sys.exit(1)
+    sys.exit(main())
